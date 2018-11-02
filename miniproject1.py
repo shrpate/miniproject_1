@@ -3,7 +3,6 @@ import sqlite3, time, random
 connection = sqlite3.connect('miniproject1.db')
 c = connection.cursor()
 loggedIn = False
-i = '1'
 
 def register(email, name, phone, pwd):
     c.execute ("INSERT INTO members VALUES (:email, :name, :phone, :pwd)", {'email': email, 'name': name, 'phone': phone, 'pwd': pwd})
@@ -23,11 +22,8 @@ def askDupEmail(email):
                 break
     return dupEmail
     
-def registering():
-    
-    
+def registering():    
     mainInput = str(input("To register, type 1\nTo go back to main screen, type 2\nTo exit, type 0: "))
-                        
     if mainInput == '1':
         valEmail = False
         
@@ -49,8 +45,6 @@ def registering():
     
     else:
         registering()
-        
- 
 
 def loginScreen():
     Input = input("\n\nPress 1 to login with a valid E-mail and Password.\nPress 2 to sign up today.\nPress 0 to exit this program.\t\t\t____")
@@ -196,8 +190,42 @@ def SearchRides():
             print("goodBye!")
             locVal = True
 
-def bookings():
-    pass
+def bookings(email):
+    c.execute("SELECT * FROM bookings b WHERE b.email == (:email)", {'email': email})
+    rideReq = c.fetchall()
+    if rideReq == []:
+        print('You have no bookings made under this Email Address.\n')
+        login()
+        
+    print('You currently have the following requests: ')
+    for item in rideReq:
+        print(item)
+     
+    option1 = input('Do you want to cancle any? (Y/N): ')
+    if option1 == 'y':
+        try:
+            delBook = input("Enter the booking number that you want to cancel: ")
+            c.execute("SELECT r.driver, r.rno FROM bookings b, rides r WHERE b.rno = r.rno AND b.email = (:email)", {'email':email})
+            qOutput = c.fetchall()
+            print(qOutput[0][1])
+            sender = (qOutput[0][0])
+            rno = (qOutput[0][1])        
+            
+            c.execute("DELETE FROM bookings WHERE bno = (:delBook)", {'delBook': delBook})
+            print("The booking has successfully been cancled and the driver has been notified")
+      
+            msgTimestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    
+            message = ("The member with E-mail address '%s' has cancled their booking."% email)
+            seen = 'n'
+    
+            c.execute("INSERT INTO inbox VALUES (:email, :msgTimestamp, :sender, :message, :rno, :seen)", {'email': sender, 'msgTimestamp': msgTimestamp, 'sender': email, 'message': message, 'rno': rno, 'seen': seen})
+
+        except:
+            print("Error occurred, please try again.") 
+            
+    else:
+        pass
 
 
 def rideRequests(email):
@@ -215,8 +243,22 @@ def rideRequests(email):
     c.execute("INSERT INTO requests VALUES (:rid, :email, :rdate, :pickup, :dropoff, :amount)", {'rid': rid, 'email': email, 'rdate': rdate, 'pickup': pickup, 'dropoff': dropoff, 'amount': amount})
     print("The ride request has been successfully created!")
 
-def searchDelRideReq():
-    pass
+def searchDelRideReq(email):
+    c.execute("SELECT * FROM requests r WHERE r.email ==  (:email)", {'email': email})
+    rideReq = c.fetchall()
+    for item in rideReq:
+        print(item)
+        rid = rideReq[0][0]
+    if rideReq == None:
+        print('You have no current ride requests')
+    else:
+        delReq = input("Enter the ride number that you want to delete: ")
+    
+    c.execute("DELETE FROM requests WHERE rid=(:delReq)", {'delReq': delReq})
+    if not (c.fetchall()):
+        print("The request has successfully been deleted.")
+    else:
+        print("Error occurred, please try again.")
 
 def login():
     loginSuccess = False
@@ -232,7 +274,6 @@ def login():
     for items in userEmail:
         if userFound == True:
             break
-        
         else:
             check = email in list(items)
             if check:
@@ -270,7 +311,7 @@ def login():
                 optionVal = True
                 
             elif optionInput == '3':
-                bookings()
+                bookings(email)
                 optionVal = True
                 
             elif optionInput == '4':
@@ -278,7 +319,7 @@ def login():
                 optionVal = True
                 
             elif optionInput == '5':
-                searchDelRideReq()
+                searchDelRideReq(email)
                 optionVal = True
                 
             elif optionInput == '0':  # To exit
