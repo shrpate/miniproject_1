@@ -228,20 +228,20 @@ def bookings(email):
         pass
 
 def rideRequests(email):
-    
-    c.execute("SELECT count(*) FROM requests")
-    for item in (c.fetchall()):
-        rid = item
-    
-    rid = rid[0] + 1 #unique ride number for the user.
+       
+    rid = random.randint(0, 100000) #random & unique ride number for the user.
     rdate = input("Provide a date in MM/DD/YYYY form: ")
     pickup = input("Provide a Pick up Location code: ")
     dropoff = input("Provide a Drop off Location code: ")
     amount = input("Provide the amount willing to pay per seat: $")
     #create a request for the user
-    c.execute("INSERT INTO requests VALUES (:rid, :email, :rdate, :pickup, :dropoff, :amount)", {'rid': rid, 'email': email, 'rdate': rdate, 'pickup': pickup, 'dropoff': dropoff, 'amount': amount})
-    print("The ride request has been successfully created!") 
-
+    try:
+        c.execute("INSERT INTO requests VALUES (:rid, :email, :rdate, :pickup, :dropoff, :amount)", {'rid': rid, 'email': email, 'rdate': rdate, 'pickup': pickup, 'dropoff': dropoff, 'amount': amount})
+        print("The ride request has been successfully created!")
+    except:
+        print("Error occured, please try again!")
+        rideRequests(email)
+       
 def searchDelRideReq(email): # delete a ride request. #also need to send a proper message, which is yet to implement.
     c.execute("SELECT * FROM requests r WHERE r.email ==  (:email)", {'email': email})
     rideReq = c.fetchall()
