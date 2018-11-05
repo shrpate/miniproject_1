@@ -39,6 +39,8 @@ def registering():
                 valEmail = True
                 register(email, name, phone, pwd)
                 
+    elif mainInput == '2':
+        loginScreen()
     elif mainInput == '0':
         time.sleep(0.5)
         print('Exiting')
