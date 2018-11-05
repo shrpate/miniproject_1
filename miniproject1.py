@@ -261,6 +261,40 @@ def searchDelRideReq(email): # delete a ride request. #also need to send a prope
             print("The request has successfully been deleted.")
         else:
             print("Error occurred, please try again.")
+            
+    searchRidReq = input("Enter a location code or a city that you want to see the listing for, or press 0 to exit: ") 
+    
+    if searchRidReq == '0':
+        print("Exiting...")
+        time.sleep(0.5)
+        print("goodBye!")
+        
+    else:
+        c.execute("SELECT r.rid, r.email, r.rdate, r.pickup, r.dropoff, r.amount FROM requests r, locations l WHERE (l.lcode = (:searchRidReq) or l.city = (:searchRidReq)) AND (r.pickup = l.lcode or r.pickup = l.city) LIMIT 5", {'searchRidReq': searchRidReq}) #will get upto 5 rides as per the user's wish. 
+        for item in (c.fetchall()):
+            print (item) # prints (upto 5) rides here
+        
+        moreOp = input("To print more option type 'more' or '1' to continue: ") #if they wish to see more then 5 rides.
+        if moreOp == "more":
+            c.execute("SELECT r.rid, r.email, r.rdate, r.pickup, r.dropoff, r.amount FROM requests r, locations l WHERE (l.lcode = (:searchRidReq) or l.city = (:searchRidReq)) AND (r.pickup = l.lcode or r.pickup = l.city)", {'searchRidReq': searchRidReq}) #will return ALL the rides as per the user's wish.
+            for item in (c.fetchall()):
+                print (item) #print ALL the rides here
+        
+        option1 = input("Enter the rid for the ride you want to request of press 0 to exit: ")
+        
+        if option1 == '0':  #TO EXIT
+            print("Exiting...")
+            time.sleep(0.5)
+            print("goodBye!")  
+        else:
+            c.execute("SELECT r.email FROM requests r WHERE r.rid = (:option1)", {'option1': option1}) #gets the email of to driver to whom, the program will send the message to
+            output1 = c.fetchall()
+            msgTimestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+            message = ("The member with E-mail address '%s' would like to check out a ride."% email) #message that the driver gets on behalf of the sender(current user)
+            seen = 'n'
+            
+            c.execute("INSERT INTO inbox VALUES (:email, :msgTimestamp, :sender, :message, :rno, :seen)", {'email': output1[0][0], 'msgTimestamp': msgTimestamp, 'sender': email, 'message': message, 'rno': option1, 'seen': seen})
+            print("Your request has been succefully completed and the driver is been notified.") #Success message, no error check as there are 0% chance or error here.
 
 def login(): #proper login
     loginSuccess = False # login unsuccesfull by default
