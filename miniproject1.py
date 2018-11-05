@@ -28,16 +28,19 @@ def registering():
         valEmail = False #The input is assumned to be invalid
         
         while not valEmail: #keep looping until the valid input is received.
-            email = str(input("Enter your E-mail: "))
+            email = str(input("Enter your E-mail: ")).lower()
+            if email == "":
+                print("Invalid Email, try again!") #if the user tries to keep null value for the email address.
+                registering()
             if email == '0':
                 loginScreen() #take the user to the login screen
             
-            if askDupEmail(email) == False: #if there email is unique, register them.
+            if askDupEmail(email) == False: #if the user's email is unique, let them enter rest of their information
                 name = str(input("Enter your Name: "))
                 phone = str(input("Enter your Phone Number: "))
-                pwd = str(input("Enter your Pwd: "))
+                pwd = str(input("Enter your Pwd: ")).lower()
                 valEmail = True
-                register(email, name, phone, pwd)
+                register(email, name, phone, pwd) #register them with the information they provided. 
                 
     elif mainInput == '2':
         loginScreen()
