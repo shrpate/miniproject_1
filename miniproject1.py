@@ -123,7 +123,7 @@ def offerRide(email):
         else:
             print("Please enter a valid input")
     if valid_selection:
-        rno = random.randint(0, 100000)
+        rno = random.randint(1, 100000)
         #update_offer = 
         c.execute("UPDATE rides SET driver = (:email), rno = (:rno)", {"email":email, "rno": rno})
         print("driver and ride number have been updated")
@@ -229,7 +229,7 @@ def bookings(email):
 
 def rideRequests(email):
        
-    rid = random.randint(0, 100000) #random & unique ride number for the user.
+    rid = random.randint(1, 100000) #random & unique ride number for the user.
     rdate = input("Provide a date in MM/DD/YYYY form: ")
     pickup = input("Provide a Pick up Location code: ")
     dropoff = input("Provide a Drop off Location code: ")
@@ -251,13 +251,16 @@ def searchDelRideReq(email): # delete a ride request. #also need to send a prope
     if rideReq == None:
         print('You have no current ride requests')
     else:
-        delReq = input("Enter the ride number that you want to delete: ")
+        delReq = input("Enter the ride number that you want to delete or 0 to go back to the main menu: ")
     
-    c.execute("DELETE FROM requests WHERE rid=(:delReq)", {'delReq': delReq})
-    if not (c.fetchall()):
-        print("The request has successfully been deleted.")
+    if delReq == '0':
+        login()
     else:
-        print("Error occurred, please try again.")
+        c.execute("DELETE FROM requests WHERE rid=(:delReq)", {'delReq': delReq})
+        if not (c.fetchall()):
+            print("The request has successfully been deleted.")
+        else:
+            print("Error occurred, please try again.")
 
 def login(): #proper login
     loginSuccess = False # login unsuccesfull by default
