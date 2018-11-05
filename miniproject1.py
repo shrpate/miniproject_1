@@ -253,19 +253,25 @@ def bookings(email):
             sender = (qOutput[0][0]) #driver
             rno = (qOutput[0][1])        
             
-            c.execute("DELETE FROM bookings WHERE bno = (:delBook)", {'delBook': delBook})
-            print("The booking has successfully been cancled and the driver has been notified")
-      
-            msgTimestamp = time.strftime("%Y-%m-%d %H:%M:%S") #print the date and the time at the time of cancling the booking
-    
-            message = ("The member with E-mail address '%s' has cancled their booking."% email) #print a proper cancelation message to the driver
-            seen = 'n'
-    
-            c.execute("INSERT INTO inbox VALUES (:email, :msgTimestamp, :sender, :message, :rno, :seen)", {'email': sender, 'msgTimestamp': msgTimestamp, 'sender': email, 'message': message, 'rno': rno, 'seen': seen})
+            if delBook != str(rno):
+                print ("ERROR, The ride number does not match the list, try again")
+                
+            else:
+                
+                c.execute("DELETE FROM bookings WHERE bno = (:delBook)", {'delBook': delBook})
+                
+                print("The booking has successfully been cancled and the driver has been notified")
+          
+                msgTimestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+        
+                message = ("The member with E-mail address '%s' has cancled their booking."% email)
+                seen = 'n'
+        
+                c.execute("INSERT INTO inbox VALUES (:email, :msgTimestamp, :sender, :message, :rno, :seen)", {'email': sender, 'msgTimestamp': msgTimestamp, 'sender': email, 'message': message, 'rno': rno, 'seen': seen})
 
         except:
-            print("Error occurred, please try again.") #if something goes wrong above, raise error and break out of the function.
-            
+            print("Error occurred, please try again.")
+        
     else:
         pass
 
