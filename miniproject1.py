@@ -160,31 +160,71 @@ def get_location(location):
 def SearchRides():
     locVal = False
     while not locVal:
-        locNo = input('Type a number between 1 and 3 for the number of location keywords you want to enter.\nType 0 to exit: ') #how many keywords does the user want to enter
+        locNo = input('Type a number between 1 and 3 for the number of location keywords you want to enter.\nType 0 to exit: ')
         
-        if locNo == '1': #or locNo == '2' or locNo =='3':
-            searchInput = input('Enter the location key: ')
-            
+        def QWithLim (searchInput): #Query as a function with limit 5
             c.execute("SELECT r.rno FROM rides r, locations l, enroute e WHERE (:searchInput) == r.src or (:searchInput) == r.dst or (:searchInput) == l.lcode or (:searchInput) == e.lcode or (:searchInput) == l.city or (:searchInput) == l.prov or (:searchInput) == l.address LIMIT 5" , {'searchInput': searchInput})
-            SearchQuery = c.fetchall()
-            print(SearchQuery)
-            moreOption = input('To continue, type 1.\nTo view all the ride option, type 2.\nType 0 to exit: ')
-            if moreOption =='2':
-                
-                c.execute("SELECT r.rno FROM rides r, locations l, enroute e WHERE (:searchInput) == r.src or (:searchInput) == r.dst or (:searchInput) == l.lcode or (:searchInput) == e.lcode or (:searchInput) == l.city or (:searchInput) == l.prov or (:searchInput) == l.address" , {'searchInput': searchInput})
-                SearchQuery = c.fetchall()
-                print(SearchQuery) #return the valid rides
-                
-            elif moreOption =='0':
-                print("Exiting...")
-                time.sleep(0.5)
-                print("goodBye!")                
-                
-            elif moreOption =='1':
-                pass
-            locVal = True
+        def QWithoutLim(searchInput):     #Query as a function with all options      
+            c.execute("SELECT r.rno FROM rides r, locations l, enroute e WHERE (:searchInput) == r.src or (:searchInput) == r.dst or (:searchInput) == l.lcode or (:searchInput) == e.lcode or (:searchInput) == l.city or (:searchInput) == l.prov or (:searchInput) == l.address" , {'searchInput': searchInput})        
             
-        elif locNo == '0': # Exit the program
+        if locNo == '1':
+            searchInput = input('Enter the location key: ')
+            QWithLim(searchInput)             #with 5 at max limit
+            SearchQuery = c.fetchall()
+            print(SearchQuery[0])
+            op = input("To view all the rides type 'more' or press '1' to continue: ")
+            if op == "more":
+                QWithoutLim(searchInput)      #with no limit, views all.
+                SearchQuery = c.fetchall()
+                print(SearchQuery[0])                
+            
+        if locNo == '2':
+                searchInput1 = input('Enter the location key: ')
+                searchInput2 = input('Enter the location key: ')
+                
+                QWithLim(searchInput1)             #with 5 at max limit
+                SearchQuery1 = c.fetchall()
+                QWithLim(searchInput2)             #with 5 at max limit
+                SearchQuery2 = c.fetchall()                
+                print(SearchQuery1[0])
+                print(SearchQuery2[0])
+                op = input("To view all the rides type 'more' or press '1' to continue: ")
+                if op == "more":
+                    QWithoutLim(searchInput1)             #with no limit, views all.
+                    SearchQuery1 = c.fetchall()
+                    QWithoutLim(searchInput2)             #with no limit, views all.
+                    SearchQuery2 = c.fetchall()                
+                    print(SearchQuery1[0])
+                    print(SearchQuery2[0])             
+                
+                
+        if locNo == '3':
+                searchInput1 = input('Enter the location key: ')
+                searchInput2 = input('Enter the location key: ')
+                searchInput3 = input('Enter the location key: ')
+                
+                QWithLim(searchInput1)             #with 5 at max limit
+                SearchQuery1 = c.fetchall()
+                QWithLim(searchInput2)             #with 5 at max limit
+                SearchQuery2 = c.fetchall()
+                QWithLim(searchInput3)             #with 5 at max limit
+                SearchQuery3 = c.fetchall()                
+                print(SearchQuery1[0])
+                print(SearchQuery2[0])
+                print(SearchQuery3[0])
+                op = input("To view all the rides type 'more' or press '1' to continue: ")
+                if op == "more":
+                    QWithoutLim(searchInput1)             #with no limit, views all.
+                    SearchQuery1 = c.fetchall()
+                    QWithoutLim(searchInput2)             #with no limit, views all.
+                    SearchQuery2 = c.fetchall()
+                    QWithoutLim(searchInput3)             #with no limit, views all.
+                    SearchQuery3 = c.fetchall()                     
+                    print(SearchQuery1[0])
+                    print(SearchQuery2[0])
+                    print(SearchQuery3[0])
+                
+        if locNo == '0':
             print("Exiting...")
             time.sleep(0.5)
             print("goodBye!")
